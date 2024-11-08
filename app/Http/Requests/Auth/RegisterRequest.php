@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Auth;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class ProductRequest extends FormRequest
+class RegisterRequest extends FormRequest
 {
   /**
    * Determine if the user is authorized to make this request.
@@ -23,26 +23,19 @@ class ProductRequest extends FormRequest
   public function rules(): array
   {
     return [
-      'category_id' => [
-        'required',
-        'exists:categories,id'
-      ],
       'name' => [
         'required',
         'string',
-        Rule::unique('products', 'name')->ignore($this->product)
+        'max:100'
       ],
-      'stock' => [
+      'email' => [
         'required',
-        'integer'
+        'email',
+        Rule::unique('users', 'email')->ignore($this->user)
       ],
-      'number_of_sales' => [
+      'password' => [
         'required',
-        'integer'
-      ],
-      'transaction_date' => [
-        'required',
-        'date'
+        'confirmed'
       ]
     ];
   }
