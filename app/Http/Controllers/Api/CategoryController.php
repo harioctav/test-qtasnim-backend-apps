@@ -8,9 +8,19 @@ use App\Http\Resources\CategoryResource;
 use App\Models\Category;
 use App\Services\Category\CategoryService;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class CategoryController extends Controller
+class CategoryController extends Controller implements HasMiddleware
 {
+
+  public static function middleware()
+  {
+    return [
+      new Middleware('auth:sanctum', except: [])
+    ];
+  }
+
   protected $categoryService;
 
   /**
