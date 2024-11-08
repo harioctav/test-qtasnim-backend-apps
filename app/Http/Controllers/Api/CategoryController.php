@@ -30,9 +30,7 @@ class CategoryController extends Controller
   public function index()
   {
     return response()->json([
-      'categories' => CategoryResource::collection(
-        Category::latest()->paginate(5)
-      )->response()->getData()
+      'categories' => $this->categoryService->query()->latest()->paginate(5)
     ]);
   }
 
@@ -43,8 +41,7 @@ class CategoryController extends Controller
   {
     $category = $this->categoryService->handleStoreData($request);
     return response()->json([
-      'message' => 'Successfully Added new Data',
-      'category' => new CategoryResource($category)
+      'category' => $category
     ]);
   }
 
@@ -54,8 +51,7 @@ class CategoryController extends Controller
   public function show(Category $category)
   {
     return response()->json([
-      'message' => "Finded Category with id: {$category->id}",
-      'category' => new CategoryResource($category)
+      'category' => $category
     ]);
   }
 
@@ -67,8 +63,7 @@ class CategoryController extends Controller
     $category->update($request->validated());
 
     return response()->json([
-      'message' => "Successfully Updated Category with Id: {$category->name}",
-      'category' => new CategoryResource($category)
+      'category' => $category
     ]);
   }
 

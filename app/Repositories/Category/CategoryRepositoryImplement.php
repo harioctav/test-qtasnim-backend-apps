@@ -4,20 +4,50 @@ namespace App\Repositories\Category;
 
 use LaravelEasyRepository\Implementations\Eloquent;
 use App\Models\Category;
+use Illuminate\Database\Eloquent\Builder;
 
-class CategoryRepositoryImplement extends Eloquent implements CategoryRepository{
+class CategoryRepositoryImplement extends Eloquent implements CategoryRepository
+{
+  protected Category $model;
 
-    /**
-    * Model class to be used in this repository for the common methods inside Eloquent
-    * Don't remove or change $this->model variable name
-    * @property Model|mixed $model;
-    */
-    protected Category $model;
+  public function __construct(Category $model)
+  {
+    $this->model = $model;
+  }
 
-    public function __construct(Category $model)
-    {
-        $this->model = $model;
+  /**
+   * Get a query builder instance for the model.
+   *
+   * @return \Illuminate\Database\Eloquent\Builder
+   */
+  public function query(): Builder
+  {
+    return $this->model->query();
+  }
+
+  public function getWhere(
+    $wheres = [],
+    $columns = '*',
+    $comparisons = '=',
+    $orderBy = null,
+    $orderByType = null
+  ) {
+    $data = $this->model->select($columns);
+
+    if (!empty($wheres)) {
+      foreach ($wheres as $key => $value) {
+        if (is_array($value)) {
+          $data = $data->whereIn($key, $value);
+        } else {
+          $data = $data->where($key, $comparisons, $value);
+        }
+      }
     }
 
-    // Write something awesome :)
+    if ($orderBy) {
+      $data = $data->orderBy($orderBy, $orderByType);
+    }
+
+    return $data;
+  }
 }
