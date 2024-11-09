@@ -40,6 +40,14 @@ class ProductController extends Controller
       });
     }
 
+    // Handle date range filter
+    if ($request->has('start_date') && $request->has('end_date')) {
+      $query->whereBetween('created_at', [
+        $request->start_date . ' 00:00:00',
+        $request->end_date . ' 23:59:59'
+      ]);
+    }
+
     // Handle sorting
     $sortField = $request->input('sort_field', 'created_at');
     $sortOrder = $request->input('sort_order', 'desc');
