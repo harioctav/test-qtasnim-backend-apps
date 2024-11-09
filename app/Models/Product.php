@@ -17,7 +17,7 @@ class Product extends Model
    */
   protected $fillable = [
     'uuid',
-    'category_id',
+    'type',
     'name',
     'stock',
     'number_of_sales',
@@ -42,15 +42,5 @@ class Product extends Model
   public function getRouteKeyName(): string
   {
     return 'uuid';
-  }
-
-  /**
-   * Get the category that the product belongs to.
-   *
-   * @return BelongsTo
-   */
-  public function category(): BelongsTo
-  {
-    return $this->belongsTo(Category::class);
   }
 }

@@ -1,0 +1,51 @@
+[
+    {
+        "name": "Kopi Kapal Api",
+        "stock": 100,
+        "number_of_sales": 10,
+        "transaction_date": "2021-05-01",
+        "type": "Konsumsi"
+    },
+    {
+        "name": "Gula Pasir",
+        "stock": 100,
+        "number_of_sales": 19,
+        "transaction_date": "2021-05-05",
+        "type": "Konsumsi"
+    },
+    {
+        "name": "Teh Manis",
+        "stock": 90,
+        "number_of_sales": 15,
+        "transaction_date": "2021-05-10",
+        "type": "Konsumsi"
+    },
+    {
+        "name": "Pasta Gigi",
+        "stock": 100,
+        "number_of_sales": 20,
+        "transaction_date": "2021-05-11",
+        "type": "Pembersih"
+    },
+    {
+        "name": "Sabun Mandi",
+        "stock": 100,
+        "number_of_sales": 30,
+        "transaction_date": "2021-05-11",
+        "type": "Pembersih"
+    },
+    {
+        "name": "Shampoo",
+        "stock": 100,
+        "number_of_sales": 25,
+        "transaction_date": "2021-05-11",
+        "type": "Pembersih"
+    },
+    {
+        "name": "Kopi Gula Aren",
+        "stock": 81,
+        "number_of_sales": 5,
+        "transaction_date": "2021-05-12",
+        "type": "Konsumsi"
+    }
+]
