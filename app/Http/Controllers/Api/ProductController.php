@@ -8,6 +8,7 @@ use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use App\Services\Product\ProductService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
@@ -103,6 +104,105 @@ class ProductController extends Controller
     $this->productService->delete($product->id);
     return response()->json([
       'message' => 'Successfully Deleted Data'
+    ]);
+  }
+
+  /**
+   * Get sales comparison by product type
+   */
+  public function getSalesComparison(Request $request)
+  {
+    // Query untuk mendapatkan data penjualan berdasarkan type
+    $salesByType = Product::select('type')
+      ->selectRaw('COUNT(*) as total_products')
+      ->selectRaw('SUM(number_of_sales) as total_sales')
+      ->selectRaw('AVG(number_of_sales) as average_sales')
+      ->selectRaw('MAX(number_of_sales) as highest_sales')
+      ->selectRaw('MIN(number_of_sales) as lowest_sales')
+      ->groupBy('type');
+
+    // Handle filter date range jika ada
+    if ($request->has('start_date') && $request->has('end_date')) {
+      $salesByType->whereBetween('transaction_date', [
+        $request->start_date . ' 00:00:00',
+        $request->end_date . ' 23:59:59'
+      ]);
+    }
+
+    // Get top selling products per type
+    $topSellingProducts = Product::select('type', 'name', 'number_of_sales')
+      ->whereIn('number_of_sales', function ($query) {
+        $query->select(DB::raw('MAX(number_of_sales)'))
+          ->from('products')
+          ->groupBy('type');
+      })
+      ->get()
+      ->groupBy('type');
+
+    // Get lowest selling products per type
+    $lowestSellingProducts = Product::select('type', 'name', 'number_of_sales')
+      ->whereIn('number_of_sales', function ($query) {
+        $query->select(DB::raw('MIN(number_of_sales)'))
+          ->from('products')
+          ->groupBy('type');
+      })
+      ->get()
+      ->groupBy('type');
+
+    $salesComparison = $salesByType->get()->map(function ($item) use ($topSellingProducts, $lowestSellingProducts) {
+      return [
+        'type' => $item->type,
+        'total_products' => $item->total_products,
+        'total_sales' => $item->total_sales,
+        'average_sales' => round($item->average_sales, 2),
+        'highest_sales' => [
+          'value' => $item->highest_sales,
+          'product' => $topSellingProducts[$item->type]->first()
+        ],
+        'lowest_sales' => [
+          'value' => $item->lowest_sales,
+          'product' => $lowestSellingProducts[$item->type]->first()
+        ]
+      ];
+    });
+
+    return response()->json([
+      'sales_comparison' => $salesComparison
+    ]);
+  }
+
+  /**
+   * Get sales trend by product type
+   */
+  public function getSalesTrend(Request $request)
+  {
+    $query = Product::select(
+      'type',
+      DB::raw('DATE(transaction_date) as date'),
+      DB::raw('SUM(number_of_sales) as daily_sales')
+    )
+      ->groupBy('type', DB::raw('DATE(transaction_date)'));
+
+    if ($request->has('start_date') && $request->has('end_date')) {
+      $query->whereBetween('transaction_date', [
+        $request->start_date . ' 00:00:00',
+        $request->end_date . ' 23:59:59'
+      ]);
+    }
+
+    $salesTrend = $query->get()
+      ->groupBy('type')
+      ->map(function ($items) {
+        return $items->map(function ($item) {
+          return [
+            'date' => $item->date,
+            'sales' => $item->daily_sales
+          ];
+        });
+      });
+
+    return response()->json([
+      'sales_trend' => $salesTrend
     ]);
   }
 }

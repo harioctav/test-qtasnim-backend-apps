@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\Api\Auth\AuthController;
-use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ProductController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -17,5 +16,9 @@ Route::middleware('auth:sanctum')
   ->group(function () {
     Route::post('logout', [AuthController::class, 'logout']);
 
+    Route::prefix('products')->group(function () {
+      Route::get('sales-trend', [ProductController::class, 'getSalesTrend']);
+      Route::get('sales-comparison', [ProductController::class, 'getSalesComparison']);
+    });
     Route::apiResource('products', ProductController::class);
   });
